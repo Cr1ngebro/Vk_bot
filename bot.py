@@ -57,4 +57,4 @@ for event in longpoll.listen():
             send_message(ADMIN_ID, f"🔔 Вас вызывает пользователь: https://vk.com/id{user_id}")
         
         else:
-            send_message(user_id, "❓ Я не понимаю. Пожалуйста, выберите действие из меню.", keyboard=get_keyboard())
+            send_message(user_id, "", keyboard=get_keyboard())
