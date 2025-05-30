@@ -1,4 +1,6 @@
 import os
+import json
+import random
 import vk_api
 from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 
@@ -14,8 +16,8 @@ def send_message(user_id, message, keyboard=None):
     vk.messages.send(
         user_id=user_id,
         message=message,
-        keyboard=keyboard,
-        random_id=0
+        keyboard=json.dumps(keyboard) if keyboard else None,  # Сериализуем клавиатуру
+        random_id=random.randint(1, 2**31 - 1)  # Уникальный random_id
     )
 
 def get_keyboard():
