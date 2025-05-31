@@ -7,6 +7,7 @@ from vk_api.bot_longpoll import VkBotLongPoll, VkBotEventType
 GROUP_TOKEN = os.getenv("GROUP_TOKEN")
 ADMIN_ID = int(os.getenv("ADMIN_ID"))
 GROUP_ID = int(os.getenv("GROUP_ID"))
+PAYMENT_DETAILS = os.getenv("PAYMENT_DETAILS")
 
 vk_session = vk_api.VkApi(token=GROUP_TOKEN)
 longpoll = VkBotLongPoll(vk_session, group_id=GROUP_ID)
@@ -55,26 +56,19 @@ def get_keyboard():
         ]
     }
 
-# Для отправки приветствия по команде "начать" или "привет" оставим простую проверку на текст
-# Но дальше бот реагирует ТОЛЬКО на payload от кнопок
-
 for event in longpoll.listen():
     if event.type == VkBotEventType.MESSAGE_NEW and event.from_user:
         message = event.object.message
         user_id = message['from_id']
 
-        # Если есть payload — значит, нажата кнопка
         payload = message.get('payload')
         
-        # Обработка приветствия по тексту (без payload)
         if not payload:
             text = message['text'].lower()
             if text in ['начать', 'start', 'привет']:
                 send_message(user_id, "👋 Добро пожаловать! Выберите действие:", keyboard=get_keyboard())
-            # Игнорируем любые другие тексты
             continue
         
-        # Если payload есть — парсим его
         try:
             data = json.loads(payload)
             button = data.get('button')
@@ -82,13 +76,7 @@ for event in longpoll.listen():
             button = None
 
         if button == 'payment_details':
-            send_message(user_id, """💳 Реквизиты для оплаты:
-+79088745655 ✅СБЕР✅ Максим С. 
-(На СБЕР можно отправить из любого банка через СБП)
-
-‼Перевод отправленный в другой банк - не будет засчитан и возврата так же не будет‼
-
-Если отправили на другой банк - считаем подарком от вас! ПЕРЕВОДИТЬ ТОЛЬКО СТРОГО НА СБЕР!👌""")
+            send_message(user_id, PAYMENT_DETAILS or "⚠ Реквизиты временно недоступны. Попробуйте позже.")
 
         elif button == 'terms':
             send_message(user_id, """📌 Условия использования:
